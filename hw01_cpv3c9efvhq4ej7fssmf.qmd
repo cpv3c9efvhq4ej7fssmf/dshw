@@ -6,6 +6,8 @@ editor: visual
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(nycflights13)
 ```
 
 ## Instructions
@@ -58,15 +60,26 @@ pacman::p_load(pacman, tidyverse,
 -   **Problem 2**: Is there a relationship between the age of a plane and its delays?
 
 ```{r}
-help(flights)
-help(planes)
-head(flights)
-head(planes)
+# Cleaning and structuring data
 
+flights2 <- flights %>% 
+  select(tailnum, dep_delay) %>% 
+  group_by(tailnum) %>% 
+  summarize(
+    mean_delay  =  mean(dep_delay, na.rm = TRUE)
+  )
+
+planes2 <- planes %>% 
+  select(tailnum, year)
+
+
+df <- planes2 %>% 
+  left_join(flights2, join_by(tailnum))
 ```
 
 -   **Problem 3**: Find the 10 days of the year that have the highest median departure delay, then select all flights from those 10 days.
 
 ```{r}
-
+head(flights)
+help(flights)
 ```
