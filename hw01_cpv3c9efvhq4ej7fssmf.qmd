@@ -55,18 +55,19 @@ pacman::p_load(pacman, tidyverse,
                nycflights13)
 ```
 
--   Consider the data in the nycflights13 package.
+-   Consider the data in the nycflights13 package
 
--   **Problem 2**: Is there a relationship between the age of a plane and its delays?
+## **Problem 2**: Is there a relationship between the age of a plane and its delays?
+
+### Cleaning and structuring data
 
 ```{r}
-# Cleaning and structuring data
-
 flights2 <- flights %>% 
   select(tailnum, dep_delay) %>% 
   group_by(tailnum) %>% 
   summarize(
-    mean_delay  =  mean(dep_delay, na.rm = TRUE)
+    mean_delay  =  mean(dep_delay, na.rm = TRUE),
+    .groups = "drop"
   )
 
 planes2 <- planes %>% 
@@ -74,12 +75,43 @@ planes2 <- planes %>%
 
 
 df <- planes2 %>% 
-  left_join(flights2, join_by(tailnum))
+  left_join(flights2, join_by(tailnum)) %>% 
+  mutate(age = 2013 - year) %>% 
+  drop_na()
 ```
 
--   **Problem 3**: Find the 10 days of the year that have the highest median departure delay, then select all flights from those 10 days.
+### Analysis
+
+-   H0: beta1 = 0
+
+-   HA: beta1 != 0
+
+```{r}
+planes.lm <- lm(mean_delay~age, data = df)
+summary(planes.lm)
+```
+
+-   With a p-value of 0.0598, there is not sufficient evidence to reject the null hypothesis that there is no association between aircraft age and mean delay.
+
+-   We conclude that there is no association between the age of an aircraft and its mean delays.
+
+### Plots
+
+```{r}
+plot(mean_delay~age,data=df)
+abline(planes.lm, col = "red")
+```
+
+## **Problem 3**: Find the 10 days of the year that have the highest median departure delay, then select all flights from those 10 days.
 
 ```{r}
 head(flights)
-help(flights)
+
+flights3 <- flights %>% 
+  mutate(date = make_datetime(year,month, day)) %>% 
+  group_by(date) %>% 
+  summarize(
+    mean_delay  =  mean(dep_delay, na.rm = TRUE),
+    .groups = "drop"
+  )
 ```
