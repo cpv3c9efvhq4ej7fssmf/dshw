@@ -10,42 +10,6 @@ library(tidyverse)
 library(nycflights13)
 ```
 
-## Instructions
-
-1.  **Clone the Homework Repository**\
-    Clone the GitHub repository containing the homework file to your **local machine**.
-
-2.  **Rename the File**\
-    Rename the `.qmd` file from `hw01.qmd` to: `hw01_yourusername.qmd`.\
-
-For example: `hw01_semiyari.qmd`
-
-### Working on Your Homework
-
--   As you complete each part of the homework:
-
-    -   **Stage** and **commit** your `.qmd` file *after each question/sub-question*, such as `1.1`, `1.2`, etc.\
-    -   **Render** your `.qmd` file to **HTML only** (no PDF or Word formats).\
-    -   **Push** your updates to GitHub after completing each **main question**, such as `1.0`, `2.0`, etc.
-
-> Committing and pushing to GitHub **are graded components** of this assignment.
-
-## Final Checks Before Submission
-
--   **Re-render** to HTML before your final commit and push.\
-
--   **Check your output:**\
-
-    -   Make sure **all images display correctly**.\
-    -   Avoid including **excessive output or large datasets** unless asked.
-
-## Final Submission
-
-Once you have finished and pushed your final version:
-
--   Copy the link of your **GitHub Pages site** (where the rendered HTML is published).
--   **Post the link** to the Canvas assignment submission page.
-
 ```{r}
 # Install pacman if it's not already installed
 if (!require("pacman")) install.packages("pacman")
@@ -54,8 +18,6 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load(pacman, tidyverse,
                nycflights13)
 ```
-
--   Consider the data in the nycflights13 package
 
 ## **Problem 2**: Is there a relationship between the age of a plane and its delays?
 
@@ -105,8 +67,6 @@ abline(planes.lm, col = "red")
 ## **Problem 3**: Find the 10 days of the year that have the highest median departure delay, then select all flights from those 10 days.
 
 ```{r}
-head(flights)
-
 top10delay <- flights %>% 
   mutate(date = make_datetime(year,month, day)) %>% 
   group_by(date) %>% 
@@ -122,4 +82,10 @@ flights_on_top10delay <- flights %>%
   left_join(top10delay, join_by(date)) %>% 
   drop_na(median_delay) %>% 
   select(flight, date, dep_delay)
+
+flights_on_top10delay
 ```
+
+## Extra credit per syllabus
+
+Van Halen was the rock band that famously required the removal of brown M&Ms from their bowls of M&Ms.
