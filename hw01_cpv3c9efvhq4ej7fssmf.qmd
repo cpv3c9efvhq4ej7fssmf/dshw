@@ -107,11 +107,19 @@ abline(planes.lm, col = "red")
 ```{r}
 head(flights)
 
-flights3 <- flights %>% 
+top10delay <- flights %>% 
   mutate(date = make_datetime(year,month, day)) %>% 
   group_by(date) %>% 
   summarize(
-    mean_delay  =  mean(dep_delay, na.rm = TRUE),
+    median_delay  =  median(dep_delay, na.rm = TRUE),
     .groups = "drop"
-  )
+  ) %>% 
+  arrange(desc(median_delay)) %>% 
+  head(10)
+
+flights_on_top10delay <- flights %>% 
+  mutate(date = make_datetime(year,month, day)) %>%
+  left_join(top10delay, join_by(date)) %>% 
+  drop_na(median_delay) %>% 
+  select(flight, date, dep_delay)
 ```
