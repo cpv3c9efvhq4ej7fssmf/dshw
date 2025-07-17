@@ -90,9 +90,11 @@ end <- ymd("2025-12-31")
 monthindex <- seq(2,132, by = 2)
 monthsequence <- c(start, start %m+% months(monthindex))
 monthsequence[length(monthsequence)] <- monthsequence[length(monthsequence)] - days(1)
+monthsequence
 
-
-
+year(monthsequence)
+quarter(monthsequence)
+isoweek(monthsequence)
 ```
 
 ### Question 6:
