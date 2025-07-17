@@ -4,22 +4,11 @@ format: html
 editor: visual
 ---
 
-## Instructions
-
-Complete the following exercises using the `lubridate` and `purrr` packages in R. Ensure that your solutions are optimized and use functional programming principles where applicable.
-
-1.  Load the necessary libraries.
-2.  Answer each question in separate R code chunks.
-3.  Provide detailed explanations for your approach.
-4.  Submit the rendered HTML file.
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(lubridate)
 ```
-
-## Exercise Functions:
 
 ### Question 1
 
@@ -63,7 +52,7 @@ Use and show R coding to calculate the standard deviation for each variable of t
 
 ```{r}
 sdvec <- vector(mode = "numeric", length = length(mtcars))
-for (i in seq_along(mtcars)) {
+for (i in seq_along(mtcars)) { #identifies each column to be calculated
   sdvec[[i]] <- sd(mtcars[[i]], na.rm = TRUE)
 }
 sdvec
@@ -87,9 +76,9 @@ Generate a sequence of dates from **January 1, 2015** to **December 31, 2025**, 
 ```{r}
 start <- ymd("2015-1-1")
 end <- ymd("2025-12-31")
-monthindex <- seq(2,132, by = 2)
-monthsequence <- c(start, start %m+% months(monthindex))
-monthsequence[length(monthsequence)] <- monthsequence[length(monthsequence)] - days(1)
+monthindex <- seq(2,132, by = 2) # index of which months to select from start date
+monthsequence <- c(start, start %m+% months(monthindex)) # adds the indexed months to the start month, creating vector
+monthsequence[length(monthsequence)] <- monthsequence[length(monthsequence)] - days(1) # subtracts one day from last month, since previous step added it as 1 January 2026
 monthsequence
 
 y <- year(monthsequence)
@@ -110,7 +99,7 @@ sample_dates <- c("2018-03-15", "2020-07-20", "2023-01-10", "2025-09-05")
 
 ```{r}
 sample_dates <- ymd(c("2018-03-15", "2020-07-20", "2023-01-10", "2025-09-05"))
-sample_intervals <- int_diff(sample_dates)
+sample_intervals <- int_diff(sample_dates) # creates difference in intervals vector
 
 months(sample_intervals)
 weeks(sample_intervals)
@@ -129,7 +118,7 @@ num_lists <- list(c(4, 16, 25, 36, 49), c(2.3, 5.7, 8.1, 11.4), c(10, 20, 30, 40
 
 map(.x = num_lists, .f = mean, na.rm = TRUE)
 map(.x = num_lists, .f = median, na.rm = TRUE)
-map(.x = num_lists, .f = sd, na.rm = TRUE)
+map(.x = num_lists, .f = sd, na.rm = TRUE) # couldn't get loop to work, so used map individually to find each parameter
 
 map_dbl(.x = num_lists, .f = mean, na.rm = TRUE)
 map_dbl(.x = num_lists, .f = median, na.rm = TRUE)
@@ -145,23 +134,9 @@ date_strings <- list("2023-06-10", "2022/12/25", "15-Aug-2021", "InvalidDate")
 ```
 
 ```{r}
-
+library(purrr)
+# date_strings <- list("2023-06-10", "2022/12/25", "15-Aug-2021", "InvalidDate")
+# parse_date(date_strings)
+# possibly(date_strings)
+#?possibly()
 ```
-
-## Submission
-
--   Save your Quarto file after completing each problem, render it, then stage and commit the changes.\
-
--   Include well-commented code and clear explanations.\
-
--   Make at least **one commit per question**.\
-
--   Submit the rendered file to **Canvas** and push it to your **GitHub repository**.\
-
--   Provide the link to your GitHub repository in the **Canvas gradebook** as a text submission.\
-
-🔹 **Each problem is worth 10 points.**\
-
-🔹 You will receive an additional **20 points** if you correctly push your completed file to GitHub and make at least one commit for each question.\
-
-**Good luck!**
