@@ -109,7 +109,11 @@ sample_dates <- c("2018-03-15", "2020-07-20", "2023-01-10", "2025-09-05")
 ```
 
 ```{r}
+sample_dates <- ymd(c("2018-03-15", "2020-07-20", "2023-01-10", "2025-09-05"))
+sample_intervals <- int_diff(sample_dates)
 
+months(sample_intervals)
+weeks(sample_intervals)
 ```
 
 ### Question 7: Higher-Order Functions with purrr
