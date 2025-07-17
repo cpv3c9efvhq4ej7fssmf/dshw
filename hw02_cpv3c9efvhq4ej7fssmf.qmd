@@ -92,9 +92,12 @@ monthsequence <- c(start, start %m+% months(monthindex))
 monthsequence[length(monthsequence)] <- monthsequence[length(monthsequence)] - days(1)
 monthsequence
 
-year(monthsequence)
-quarter(monthsequence)
-isoweek(monthsequence)
+y <- year(monthsequence)
+q <- quarter(monthsequence)
+iw <- isoweek(monthsequence)
+
+df <- data.frame(monthsequence, y, q, iw)
+df
 ```
 
 ### Question 6:
