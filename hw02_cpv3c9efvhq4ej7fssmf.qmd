@@ -85,6 +85,13 @@ year[leap_year(year)]
 Generate a sequence of dates from **January 1, 2015** to **December 31, 2025**, spaced by every **two months**. Extract the **year**, **quarter**, and **ISO week number** for each date.
 
 ```{r}
+start <- ymd("2015-1-1")
+end <- ymd("2025-12-31")
+monthindex <- seq(2,132, by = 2)
+monthsequence <- c(start, start %m+% months(monthindex))
+monthsequence[length(monthsequence)] <- monthsequence[length(monthsequence)] - days(1)
+
+
 
 ```
 
