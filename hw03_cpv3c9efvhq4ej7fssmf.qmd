@@ -60,9 +60,7 @@ Go to the following page [List of U.S. states and territories by population](htt
     statepop <- statepop[2:nrow(statepop),]
     ```
 
-2.  Make sure the class of each column is correct
-
-3.  Replace `__` with `NA`
+2.  Make sure the class of each column is correct + 3. Replace `__` with `NAg`
 
     ```{r}
     statepop <- statepop %>% 
@@ -91,8 +89,7 @@ Please download a duck database. <https://data-science-master.github.io/lectures
 -   Use `duckdb()` and `DBI::dbConnect()` to create a connection to "flights.duckdb".
 
 ```{r}
-     practcon<- dbConnect(duckdb(dbdir = "./data/flights.duckdb", read_only = FALSE))
-
+practcon <- dbConnect(duckdb(dbdir = "flights.duckdb", read_only = FALSE))
 ```
 
 -   `dbConnect()`: This function establishes a connection to a database.
@@ -131,6 +128,17 @@ Print out a summary of the tables in this database.
 ### Problem 2: Select Flights from a Specific Carrier
 
 Write a SQL query to find all flights from the carrier "United Air Lines Inc.".
+
+```{r, echo = FALSE, comment = ""}
+    codechunk <- "```{sql, connection=practcon}\nSELECT * FROM flights LIMIT 10\n```"
+    writeLines(codechunk)
+```
+
+```{sql, connection=practcon, echo=FALSE, eval=FALSE}
+    SELECT * FROM flights
+    WHERE "carrier" = 'UA';
+
+```
 
 ### Problem 3: Count the Number of Flights for Each Carrier
 
