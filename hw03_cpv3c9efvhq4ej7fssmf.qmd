@@ -55,7 +55,6 @@ Go to the following page [List of U.S. states and territories by population](htt
       "popPerSeat",
       "pctUS",
       "pctEC"
-      
     )
 
     statepop <- statepop[2:nrow(statepop),]
@@ -63,8 +62,10 @@ Go to the following page [List of U.S. states and territories by population](htt
 
 2.  Make sure the class of each column is correct
 
+3.  Replace `__` with `NA`
+
     ```{r}
-    statepop %>% 
+    statepop <- statepop %>% 
       mutate(
         pop2024 = parse_number(pop2024),
         pop2020 = parse_number(pop2020),
@@ -78,13 +79,9 @@ Go to the following page [List of U.S. states and territories by population](htt
         pctEC = parse_number(pctEC)
       )
 
-    statepop %>% slice(1:5)
-    ```
+    statepop[c(6,33,36,40,53,54,55,56),4:5] <- statepop[c(6,33,36,40,53,54,55,56),4:5]*-1
 
-3.  Replace `__` with `NA`
-
-    ```{r}
-
+    statepop %>% slice(1:3)
     ```
 
 ## SQL
