@@ -153,7 +153,7 @@ Write a SQL query to count the total number of flights for each carrier.
 -   if the connection is open then you need to use `dbDisconnect()` function
 
 ```{r}
-dbDisconnect()
+dbDisconnect(conn = practcon)
 ```
 
 ## Submission
