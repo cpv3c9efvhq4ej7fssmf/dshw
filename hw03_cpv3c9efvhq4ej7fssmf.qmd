@@ -60,7 +60,7 @@ Go to the following page [List of U.S. states and territories by population](htt
     statepop <- statepop[2:nrow(statepop),]
     ```
 
-2.  Make sure the class of each column is correct + 3. Replace `__` with `NAg`
+2.  Make sure the class of each column is correct + 3. Replace `__` with `NA`
 
     ```{r}
     statepop <- statepop %>% 
@@ -137,16 +137,24 @@ Write a SQL query to find all flights from the carrier "United Air Lines Inc.".
 ```{sql, connection=practcon, echo=FALSE, eval=FALSE}
     SELECT * FROM flights
     WHERE "carrier" = 'UA';
-
 ```
 
 ### Problem 3: Count the Number of Flights for Each Carrier
 
 Write a SQL query to count the total number of flights for each carrier.
 
+```{sql, connection=practcon, echo=FALSE, eval=FALSE}
+    SELECT carrier, COUNT(*) FROM flights
+    GROUP BY carrier;
+```
+
 ## Remember to Close the connection When You Are Done
 
 -   if the connection is open then you need to use `dbDisconnect()` function
+
+```{r}
+dbDisconnect()
+```
 
 ## Submission
 
