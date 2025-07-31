@@ -9,6 +9,8 @@
 
 library(shiny)
 library(ggplot2)
+library(shinyWidgets)
+library(DT)
 categoricalvars <- c(2, 8, 9)
 continuousvars <- c(1, 3, 4, 5, 6, 7, 10, 11)
 
@@ -17,7 +19,9 @@ continuousvars <- c(1, 3, 4, 5, 6, 7, 10, 11)
 ui <- fluidPage(
 
     # Application title
-    titlePanel("Homework Assignment"),
+    setBackgroundColor("yellow"),
+    h1("Homework Assignment", style = "color: red"),
+    h2("Christopher Pawlik"),
 
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
@@ -32,23 +36,27 @@ ui <- fluidPage(
             type = "pills",
             tabPanel(
               "Data",
-              plotOutput("plot1")
+              h1("Dataset: mtcars"),
+              dataTableOutput("data")
             ),
             tabPanel(
               "Summary",
-              plotOutput("plot2")
+              h1("Discrete"),
+              plotOutput("summary1"),
+              h1("Continuous"),
+              plotOutput("summary2")
             ),
             tabPanel(
               "Box plot",
-              plotOutput("plot3")
+              plotOutput("box")
             ),
             tabPanel(
-              "Bar",
-              plotOutput("plot4")
+              "Bar chart",
+              plotOutput("bar")
             ),
             tabPanel(
               "Histogram",
-              plotOutput("plot5")
+              plotOutput("hist")
             )
           )
         )
@@ -58,16 +66,23 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white',
-             xlab = 'Waiting time to next eruption (in mins)',
-             main = 'Histogram of waiting times')
+    output$data <- renderDT({
+      mtcars
     })
+    
+    output$summary <- renderPlot({
+      
+    })
+    
+    output$box <- renderPlot({
+      
+    })
+    
+    output$bar <- renderPlot({
+      
+    })
+    
+    output$hist <- renderPlot({})
 }
 
 # Run the application 
