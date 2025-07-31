@@ -12,11 +12,11 @@ library(ggplot2)
 library(tidyverse)
 library(shinyWidgets)
 library(DT)
-categoricalvars <- c(2, 8, 9)
-continuousvars <- c(1, 3, 4, 5, 6, 7, 10, 11)
+categoricalvars <- c(2, 8, 9) # vector to select only the categorical variables
+continuousvars <- c(1, 3, 4, 5, 6, 7, 10, 11) # selects only the continuous variables
 
 
-# Define UI for application that draws a histogram
+# Define UI, app layout
 ui <- fluidPage(
 
     # Application title
@@ -24,14 +24,14 @@ ui <- fluidPage(
     h1("Homework Assignment", style = "color: red"),
     h2("Christopher Pawlik"),
 
-    # Sidebar with a slider input for number of bins 
+    # Sidebar with drop-down selectors for discrete and continuous variables
     sidebarLayout(
         sidebarPanel(
-            varSelectInput("discrete", "Select categorical variable", data = mtcars[,categoricalvars]),
+            varSelectInput("discrete", "Select categorical variable", data = mtcars[,categoricalvars]), # uses selection vector specified above
             varSelectInput("continuous", "Select a continuous variable", data = mtcars[,continuousvars])
         ),
 
-        # Show a plot of the generated distribution
+        # Define tabs
         mainPanel(
           tabsetPanel(
             type = "pills",
@@ -49,14 +49,17 @@ ui <- fluidPage(
             ),
             tabPanel(
               "Box plot",
+              h3("Box plot of selected continuous variable, grouped by discrete variable"),
               plotOutput("box")
             ),
             tabPanel(
               "Bar chart",
+              h3("Bar chart of selected discrete variable"),
               plotOutput("bar")
             ),
             tabPanel(
               "Histogram",
+              h3("Bar chart of selected continuous variable"),
               plotOutput("hist")
             )
           )
@@ -64,10 +67,10 @@ ui <- fluidPage(
     )
 )
 
-# Define server logic required to draw a histogram
+# Define server logic required to draw plots and tables
 server <- function(input, output) {
 
-  x1 <- reactive({
+  x1 <- reactive({ #specify reactive variables
     input$discrete
   })
   
@@ -79,7 +82,7 @@ server <- function(input, output) {
       mtcars
     })
     
-    output$summary1 <- renderPrint({
+    output$summary1 <- renderPrint({ # used renderPrint, renderTable would not work for some reason
       summary(mtcars[[x1()]])
     })
     
@@ -88,14 +91,22 @@ server <- function(input, output) {
     })
     
     output$box <- renderPlot({
-      
+      ggplot(mtcars, aes(x = as.factor(mtcars[[x1()]]), y = mtcars[[x2()]])) +
+        geom_boxplot(color = "red") +
+        labs(x = print(x1()), y = print(x2()))
     })
     
     output$bar <- renderPlot({
-      
+      ggplot(mtcars, aes(x = as.factor(mtcars[[x1()]]))) +
+        geom_bar(fill = "white", color = "red") +
+        labs(x = print(x1()))
     })
     
-    output$hist <- renderPlot({})
+    output$hist <- renderPlot({
+      ggplot(mtcars, aes(x = mtcars[[x2()]])) +
+        geom_histogram(fill = "white", color = "red") +
+        labs(x = print(x2()))
+    })
 }
 
 # Run the application 
