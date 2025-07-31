@@ -9,6 +9,7 @@
 
 library(shiny)
 library(ggplot2)
+library(tidyverse)
 library(shinyWidgets)
 library(DT)
 categoricalvars <- c(2, 8, 9)
@@ -42,9 +43,9 @@ ui <- fluidPage(
             tabPanel(
               "Summary",
               h1("Discrete"),
-              plotOutput("summary1"),
+              tableOutput("summary1"),
               h1("Continuous"),
-              plotOutput("summary2")
+              tableOutput("summary2")
             ),
             tabPanel(
               "Box plot",
@@ -66,12 +67,24 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
-    output$data <- renderDT({
+  x1 <- reactive({
+    input$discrete
+  })
+  
+  x2 <- reactive({
+    input$continuous
+  })
+  
+  output$data <- renderDT({
       mtcars
     })
     
-    output$summary <- renderPlot({
-      
+    output$summary1 <- renderPrint({
+      summary(mtcars[[x1()]])
+    })
+    
+    output$summary2 <- renderPrint({
+      summary(mtcars[[x2()]])
     })
     
     output$box <- renderPlot({
