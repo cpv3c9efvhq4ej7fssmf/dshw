@@ -9,6 +9,9 @@
 
 library(shiny)
 library(ggplot2)
+categoricalvars <- c(2, 8, 9)
+continuousvars <- c(1, 3, 4, 5, 6, 7, 10, 11)
+
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -19,16 +22,35 @@ ui <- fluidPage(
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
         sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
+            varSelectInput("discrete", "Select categorical variable", data = mtcars[,categoricalvars]),
+            varSelectInput("continuous", "Select a continuous variable", data = mtcars[,continuousvars])
         ),
 
         # Show a plot of the generated distribution
         mainPanel(
-           plotOutput("distPlot")
+          tabsetPanel(
+            type = "pills",
+            tabPanel(
+              "Data",
+              plotOutput("plot1")
+            ),
+            tabPanel(
+              "Summary",
+              plotOutput("plot2")
+            ),
+            tabPanel(
+              "Box plot",
+              plotOutput("plot3")
+            ),
+            tabPanel(
+              "Bar",
+              plotOutput("plot4")
+            ),
+            tabPanel(
+              "Histogram",
+              plotOutput("plot5")
+            )
+          )
         )
     )
 )
