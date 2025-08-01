@@ -18,67 +18,70 @@ library(tidyverse)
 
 **Title**: Exploring Joyful Language in Jane Austen’s *Emma* using Tidytext
 
-#### **Objective**:
+**Objective**:
 
 Use the **`tidytext`** package and three different **sentiment lexicons** (`nrc`, `afinn`, `bing`) to explore **positive/joyful words** in *Emma* by Jane Austen. You will tokenize the text, apply sentiment filters, visualize frequent sentiment words using `ggplot2`, and create a word cloud.
 
-### **Tasks**:
+# **1. Data Preparation**
 
-1.  **Data Preparation**
+-   Load the `austen_books()` dataset from the **`janeaustenr`** package.
+-   Group by book and detect chapter boundaries using regex.
+-   Create `linenumber` and `chapter` columns.
 
-    -   Load the `austen_books()` dataset from the **`janeaustenr`** package.
-    -   Group by book and detect chapter boundaries using regex.
-    -   Create `linenumber` and `chapter` columns.
+```{r}
+austen <- austen_books() %>% 
+  group_by(book) %>% 
+  mutate(
+    linenumber = row_number(),
+    chapter = cumsum(str_detect(
+      text,
+      regex("^chapter [\\divxlc]",
+        ignore_case = TRUE
+      )
+    )),
+    .before = text
+  ) %>% 
+  ungroup() %>% 
+  select(book, chapter, linenumber, text)
+```
 
-    ```{r}
-    austen <- austen_books() %>% 
-      group_by(book) %>% 
-      mutate(
-        linenumber = row_number(),
-        chapter = cumsum(str_detect(
-          text,
-          regex("^chapter [\\divxlc]",
-            ignore_case = TRUE
-          )
-        )),
-        .before = text
-      ) %>% 
-      ungroup() %>% 
-      select(book, chapter, linenumber, text)
-    ```
+# **2. Tokenization**
 
-2.  **Tokenization**
+-   Use `unnest_tokens()` to tokenize text into individual words.
+-   Explain briefly **why we name the output column `word`** (include this as a comment in your script).
 
-    -   Use `unnest_tokens()` to tokenize text into individual words.
-    -   Explain briefly **why we name the output column `word`** (include this as a comment in your script).
+```{r}
+tidy_austen <- austen %>% 
+  unnest_tokens(word, text) %>%
+  mutate(word = str_extract(word, "[a-z']+")) %>% #output column is named "word" because the tokenization is performed by unit of word, rather than other unit (e.g. sentence, paragraph, etc.)
+  anti_join(stop_words, by = "word") ## filter out stop words
 
-    ```{r}
+nrow(tidy_austen)
+```
 
-    ```
+# **3. Sentiment Analysis**
 
-3.  **Sentiment Analysis**
+## Filter joy/positive words from **each** of the three sentiment lexicons:
 
-    -   Filter joy/positive words from **each** of the three sentiment lexicons:
+-   `nrc` (joy)
+-   `afinn` (positive scores ≥ 1)
+-   `bing` (positive)
 
-        -   `nrc` (joy)
-        -   `afinn` (positive scores ≥ 1)
-        -   `bing` (positive)
+```{r}
 
-    ```{r}
+```
 
-    ```
+## Join each with *Emma*'s text and:
 
-    -   Join each with *Emma*'s text and:
+-   Count word frequency.
+-   Filter for frequently occurring words (`n > 50`).
+-   Visualize using a **bar chart** (`ggplot2`) and a **word cloud** (`wordcloud`).
 
-        -   Count word frequency.
-        -   Filter for frequently occurring words (`n > 50`).
-        -   Visualize using a **bar chart** (`ggplot2`) and a **word cloud** (`wordcloud`).
+```{r}
 
-    ```{r}
+```
 
-    ```
-
-4.  **Push to GitHub**
+1.  **Push to GitHub**
 
     -   Push your complete R script (`.R` file) to a **GitHub repository**.
 
