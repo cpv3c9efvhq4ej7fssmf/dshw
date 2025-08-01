@@ -14,6 +14,7 @@ library(tidytext)
 library(gutenbergr)
 library(wordcloud)
 library(tidyverse)
+library(textdata)
 ```
 
 **Title**: Exploring Joyful Language in Jane Austen’s *Emma* using Tidytext
@@ -56,7 +57,7 @@ tidy_austen <- austen %>%
   mutate(word = str_extract(word, "[a-z']+")) %>% #output column is named "word" because the tokenization is performed by unit of word, rather than other unit (e.g. sentence, paragraph, etc.)
   anti_join(stop_words, by = "word") ## filter out stop words
 
-nrow(tidy_austen)
+tidy_austen %>% slice_sample(n = 5)
 ```
 
 # **3. Sentiment Analysis**
@@ -64,12 +65,36 @@ nrow(tidy_austen)
 ## Filter joy/positive words from **each** of the three sentiment lexicons:
 
 -   `nrc` (joy)
+
+    ```{r}
+    # nrc sentiment lexicon (one of ten emotions)
+    tidy_austen %>% 
+      filter(word %in% get_sentiments("nrc")$word[(str_detect(get_sentiments("nrc")$sentiment, "joy"))]) ## subsets get_sentiments to only joy terms, then uses this to filter the austen tokens
+    ```
+
 -   `afinn` (positive scores ≥ 1)
+
+    ```{r}
+    # afinn sentiment lexicon (values from -5 to +5)
+    tidy_austen %>% 
+      filter(word %in% (get_sentiments("afinn") %>% ## different approach here, used pipe instead of subset
+                        filter(value >= 1) %>% 
+                        pull(word)
+                      )
+      )
+    ```
+
 -   `bing` (positive)
 
-```{r}
-
-```
+    ```{r}
+    # bing sentiment lexicon (positive or negative)
+    tidy_austen %>% 
+      filter(word %in% (get_sentiments("bing") %>%
+                        filter(sentiment == "positive") %>% 
+                        pull(word)
+                      )
+      )
+    ```
 
 ## Join each with *Emma*'s text and:
 
