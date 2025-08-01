@@ -68,32 +68,38 @@ tidy_austen %>% slice_sample(n = 5)
 
     ```{r}
     # nrc sentiment lexicon (one of ten emotions)
-    tidy_austen %>% 
+    nrc_austen <- tidy_austen %>% 
       filter(word %in% get_sentiments("nrc")$word[(str_detect(get_sentiments("nrc")$sentiment, "joy"))]) ## subsets get_sentiments to only joy terms, then uses this to filter the austen tokens
+
+    nrc_austen
     ```
 
 -   `afinn` (positive scores ≥ 1)
 
     ```{r}
     # afinn sentiment lexicon (values from -5 to +5)
-    tidy_austen %>% 
+    afinn_austen <- tidy_austen %>% 
       filter(word %in% (get_sentiments("afinn") %>% ## different approach here, used pipe instead of subset
                         filter(value >= 1) %>% 
                         pull(word)
                       )
       )
+
+    afinn_austen
     ```
 
 -   `bing` (positive)
 
     ```{r}
     # bing sentiment lexicon (positive or negative)
-    tidy_austen %>% 
+    bing_austen <- tidy_austen %>% 
       filter(word %in% (get_sentiments("bing") %>%
                         filter(sentiment == "positive") %>% 
                         pull(word)
                       )
       )
+
+    bing_austen
     ```
 
 ## Join each with *Emma*'s text and:
@@ -102,37 +108,101 @@ tidy_austen %>% slice_sample(n = 5)
 -   Filter for frequently occurring words (`n > 50`).
 -   Visualize using a **bar chart** (`ggplot2`) and a **word cloud** (`wordcloud`).
 
-```{r}
+### nrc
 
+```{r}
+emma_nrc <- nrc_austen %>%
+  filter(book == "Emma") %>% 
+  inner_join(tidy_austen, by = "word") %>% 
+  group_by(word) %>% 
+  count() %>% 
+  arrange(desc(n)) %>% 
+  filter(n > 50)
+
+emma_nrc
+
+# bar chart
+nrc_austen %>%
+  filter(book == "Emma") %>% 
+  inner_join(tidy_austen, by = "word") %>% 
+  group_by(word) %>% 
+  count() %>% 
+  filter(n > 50) %>% 
+  ggplot(aes(x = word, y = n)) +
+  geom_bar(stat = "identity")
+
+# word cloud
+nrc_austen %>%
+  filter(book == "Emma") %>% 
+  inner_join(tidy_austen, by = "word") %>% 
+  group_by(word) %>% 
+  count() %>% 
+  filter(n > 50) %>% 
+  with(wordcloud(word, n, max.words = 30))
 ```
 
-1.  **Push to GitHub**
+### afinn
 
-    -   Push your complete R script (`.R` file) to a **GitHub repository**.
+```{r}
+emma_afinn <- afinn_austen %>%
+  filter(book == "Emma") %>% 
+  inner_join(tidy_austen, by = "word") %>% 
+  group_by(word) %>% 
+  count() %>% 
+  arrange(desc(n)) %>% 
+  filter(n > 50)
 
-    -   Your script should include:
+emma_afinn
 
-        -   Data wrangling
-        -   Sentiment filtering and joins
-        -   Visualization code
+# bar chart
+afinn_austen %>%
+  filter(book == "Emma") %>% 
+  inner_join(tidy_austen, by = "word") %>% 
+  group_by(word) %>% 
+  count() %>% 
+  filter(n > 50) %>% 
+  ggplot(aes(x = word, y = n)) +
+  geom_bar(stat = "identity")
 
-    -   You must include **at least 5 meaningful commits** to document your workflow.
+# word cloud
+afinn_austen %>%
+  filter(book == "Emma") %>% 
+  inner_join(tidy_austen, by = "word") %>% 
+  group_by(word) %>% 
+  count() %>% 
+  filter(n > 50) %>% 
+  with(wordcloud(word, n, max.words = 30))
+```
 
-------------------------------------------------------------------------
+### bing
 
-## **Rubric 100 Points**
+```{r}
+emma_bing <- bing_austen %>%
+  filter(book == "Emma") %>% 
+  inner_join(tidy_austen, by = "word") %>% 
+  group_by(word) %>% 
+  count() %>% 
+  arrange(desc(n)) %>% 
+  filter(n > 50)
 
-| Category                                       | Points  |
-|------------------------------------------------|---------|
-| Step 1: Data wrangling (linenumber, chapter)   | 10      |
-| Step 2: Tokenization + explanation             | 10      |
-| Step 3a: NRC sentiment analysis + plots        | 10      |
-| Step 3b: AFINN sentiment analysis + plots      | 10      |
-| Step 3c: BING sentiment analysis + plots       | 10      |
-| Code readability, structure, and comments      | 10      |
-| Word cloud for each lexicon                    | 20      |
-| GitHub submission                              |         |
-| Commit history (at least 5 meaningful commits) | 20      |
-| **Total**                                      | **100** |
+emma_bing
 
-Good Luck!
+# bar chart
+bing_austen %>%
+  filter(book == "Emma") %>% 
+  inner_join(tidy_austen, by = "word") %>% 
+  group_by(word) %>% 
+  count() %>% 
+  filter(n > 50) %>% 
+  ggplot(aes(x = word, y = n)) +
+  geom_bar(stat = "identity")
+
+# word cloud
+bing_austen %>%
+  filter(book == "Emma") %>% 
+  inner_join(tidy_austen, by = "word") %>% 
+  group_by(word) %>% 
+  count() %>% 
+  filter(n > 50) %>% 
+  with(wordcloud(word, n, max.words = 30))
+```
