@@ -182,6 +182,6 @@ emma_bing %>%
   theme_gray()
 
 # word cloud
-emma_bing %>%
+emma_nrc %>%
   with(wordcloud(word, n, max.words = 30))
 ```
