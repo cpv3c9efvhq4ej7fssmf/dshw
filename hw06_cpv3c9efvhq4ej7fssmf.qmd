@@ -8,13 +8,14 @@ editor: visual
 knitr::opts_chunk$set(echo       = TRUE, 
                       fig.align  = "center",
                       fig.height = 3, fig.width = 4)
-ggplot2::theme_set(ggplot2::theme_bw() + ggplot2::theme(strip.background = ggplot2::element_rect(fill = "white")))
+library(ggplot2)
 library(janeaustenr)
 library(tidytext)
 library(gutenbergr)
 library(wordcloud)
 library(tidyverse)
 library(textdata)
+
 ```
 
 **Title**: Exploring Joyful Language in Jane Austen’s *Emma* using Tidytext
@@ -68,38 +69,30 @@ tidy_austen %>% slice_sample(n = 5)
 
     ```{r}
     # nrc sentiment lexicon (one of ten emotions)
-    nrc_austen <- tidy_austen %>% 
-      filter(word %in% get_sentiments("nrc")$word[(str_detect(get_sentiments("nrc")$sentiment, "joy"))]) ## subsets get_sentiments to only joy terms, then uses this to filter the austen tokens
+    nrc_joy <- get_sentiments("nrc") %>% 
+      filter(sentiment == "joy")
 
-    nrc_austen
+    nrc_joy %>% slice_sample(n = 10)
     ```
 
 -   `afinn` (positive scores ≥ 1)
 
     ```{r}
     # afinn sentiment lexicon (values from -5 to +5)
-    afinn_austen <- tidy_austen %>% 
-      filter(word %in% (get_sentiments("afinn") %>% ## different approach here, used pipe instead of subset
-                        filter(value >= 1) %>% 
-                        pull(word)
-                      )
-      )
+    afinn_positive <- get_sentiments("afinn") %>% 
+      filter(value >= 1)
 
-    afinn_austen
+    afinn_positive %>% slice_sample(n = 10)
     ```
 
 -   `bing` (positive)
 
     ```{r}
     # bing sentiment lexicon (positive or negative)
-    bing_austen <- tidy_austen %>% 
-      filter(word %in% (get_sentiments("bing") %>%
-                        filter(sentiment == "positive") %>% 
-                        pull(word)
-                      )
-      )
+    bing_positive <- get_sentiments("bing") %>% 
+      filter(sentiment == "positive")
 
-    bing_austen
+    bing_positive %>% slice_sample(n = 10)
     ```
 
 ## Join each with *Emma*'s text and:
@@ -111,98 +104,84 @@ tidy_austen %>% slice_sample(n = 5)
 ### nrc
 
 ```{r}
-emma_nrc <- nrc_austen %>%
+# subsetting the words from "Emma" and joining to the "joy" words in nrc lexicon
+emma_nrc <- tidy_austen %>% 
   filter(book == "Emma") %>% 
-  inner_join(tidy_austen, by = "word") %>% 
-  group_by(word) %>% 
-  count() %>% 
-  arrange(desc(n)) %>% 
+  inner_join(nrc_joy, by = "word") %>% 
+  count(word, sort = TRUE) %>% 
   filter(n > 50)
 
 emma_nrc
 
+  
 # bar chart
-nrc_austen %>%
-  filter(book == "Emma") %>% 
-  inner_join(tidy_austen, by = "word") %>% 
-  group_by(word) %>% 
-  count() %>% 
-  filter(n > 50) %>% 
-  ggplot(aes(x = word, y = n)) +
-  geom_bar(stat = "identity")
+emma_nrc %>%
+  mutate(word = fct_reorder(word, n)) %>% 
+  ggplot(aes(x = n, y = word)) +
+  geom_col(show.legend = FALSE) +
+  labs(title = "Most frequent joy-category words in novel \"Emma\"",
+       subtitle = "using the nrc sentiment lexicon",
+       x = "Count",
+       y = "Word") +
+  theme_gray()
+  
 
 # word cloud
-nrc_austen %>%
-  filter(book == "Emma") %>% 
-  inner_join(tidy_austen, by = "word") %>% 
-  group_by(word) %>% 
-  count() %>% 
-  filter(n > 50) %>% 
+emma_nrc %>%
   with(wordcloud(word, n, max.words = 30))
 ```
 
 ### afinn
 
 ```{r}
-emma_afinn <- afinn_austen %>%
+emma_afinn <- tidy_austen %>% 
   filter(book == "Emma") %>% 
-  inner_join(tidy_austen, by = "word") %>% 
-  group_by(word) %>% 
-  count() %>% 
-  arrange(desc(n)) %>% 
+  inner_join(afinn_positive, by = "word") %>% 
+  count(word, sort = TRUE) %>% 
   filter(n > 50)
 
 emma_afinn
 
+
 # bar chart
-afinn_austen %>%
-  filter(book == "Emma") %>% 
-  inner_join(tidy_austen, by = "word") %>% 
-  group_by(word) %>% 
-  count() %>% 
-  filter(n > 50) %>% 
-  ggplot(aes(x = word, y = n)) +
-  geom_bar(stat = "identity")
+emma_afinn %>%
+  mutate(word = fct_reorder(word, n)) %>% 
+  ggplot(aes(x = n, y = word)) +
+  geom_col(show.legend = FALSE) +
+  labs(title = "Most frequent words rated +1 or higher in novel \"Emma\"",
+       subtitle = "using the afinn sentiment lexicon",
+       x = "Count",
+       y = "Word") +
+  theme_gray()
 
 # word cloud
-afinn_austen %>%
-  filter(book == "Emma") %>% 
-  inner_join(tidy_austen, by = "word") %>% 
-  group_by(word) %>% 
-  count() %>% 
-  filter(n > 50) %>% 
+emma_afinn %>%
   with(wordcloud(word, n, max.words = 30))
 ```
 
 ### bing
 
 ```{r}
-emma_bing <- bing_austen %>%
+emma_bing <- tidy_austen %>% 
   filter(book == "Emma") %>% 
-  inner_join(tidy_austen, by = "word") %>% 
-  group_by(word) %>% 
-  count() %>% 
-  arrange(desc(n)) %>% 
+  inner_join(bing_positive, by = "word") %>% 
+  count(word, sort = TRUE) %>% 
   filter(n > 50)
-
+  
 emma_bing
 
 # bar chart
-bing_austen %>%
-  filter(book == "Emma") %>% 
-  inner_join(tidy_austen, by = "word") %>% 
-  group_by(word) %>% 
-  count() %>% 
-  filter(n > 50) %>% 
-  ggplot(aes(x = word, y = n)) +
-  geom_bar(stat = "identity")
+emma_bing %>%
+  mutate(word = fct_reorder(word, n)) %>% 
+  ggplot(aes(x = n, y = word)) +
+  geom_col(show.legend = FALSE) +
+  labs(title = "Most frequent positive words in novel \"Emma\"",
+       subtitle = "using the bing sentiment lexicon",
+       x = "Count",
+       y = "Word") +
+  theme_gray()
 
 # word cloud
-bing_austen %>%
-  filter(book == "Emma") %>% 
-  inner_join(tidy_austen, by = "word") %>% 
-  group_by(word) %>% 
-  count() %>% 
-  filter(n > 50) %>% 
+emma_bing %>%
   with(wordcloud(word, n, max.words = 30))
 ```
